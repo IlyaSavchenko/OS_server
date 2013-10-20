@@ -1,4 +1,4 @@
 #include <stdio.h>
 main(){
-	printf("This module for server%s\n", );
+	printf("This module for server\n");
 }
