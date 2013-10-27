@@ -12,7 +12,7 @@ main(int argc, char* argv[]){
     socklen_t addrlen; // Представляет длину структуры sockaddr -> Wiki
     char abr;	
     char PORT[4]; 
-    strcpy(PORT,"4444");
+    strcpy(PORT,"4040");
 
     if ((abr = getopt(argc, argv, "p:u:")) < -1)
         switch (abr)
