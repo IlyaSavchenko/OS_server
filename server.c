@@ -6,8 +6,8 @@
 
 
 main(int argc, char* argv[]){
-	char *USER;
-	struct sockaddr_in clientaddr; //sockaddr — обобщённая структура адреса, к которой, в зависимости от используемого семейства протоколов, приводится соответствующая структура -> Wiki
+    char *USER;
+    struct sockaddr_in clientaddr; //sockaddr — обобщённая структура адреса, к которой, в зависимости от используемого семейства протоколов, приводится соответствующая структура -> Wiki
     socklen_t addrlen; // Представляет длину структуры sockaddr -> Wiki
     char abr;	
     char PORT[4]; 
