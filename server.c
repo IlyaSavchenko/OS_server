@@ -6,9 +6,15 @@
 
 
 main(int argc, char* argv[]){
+<<<<<<< HEAD
 	char *USER;
 	int clients[100];
 	struct sockaddr_in clientaddr; //sockaddr — обобщённая структура адреса, к которой, в зависимости от используемого семейства протоколов, приводится соответствующая структура -> Wiki
+=======
+    char *USER;
+    int *clients;
+    struct sockaddr_in clientaddr; //sockaddr — обобщённая структура адреса, к которой, в зависимости от используемого семейства протоколов, приводится соответствующая структура -> Wiki
+>>>>>>> d05458da169f57d22ac30735f179c3dbc86cc27c
     socklen_t addrlen; // Представляет длину структуры sockaddr -> Wiki
     char abr;	
     char PORT[4]; 
@@ -30,9 +36,15 @@ main(int argc, char* argv[]){
             default:
                 exit(1);
         }
+<<<<<<< HEAD
 
         int con = 0;
         while (1)
+=======
+        
+        int con = 0;
+        while (true)
+>>>>>>> d05458da169f57d22ac30735f179c3dbc86cc27c
     	{
         	addrlen = sizeof(clientaddr);
         	clients[con] = accept(listenfd, (struct sockaddr *) &clientaddr, &addrlen);
@@ -45,6 +57,11 @@ main(int argc, char* argv[]){
     	}
 
     	return 0;
+<<<<<<< HEAD
 }
       
 }
+=======
+          
+}
+>>>>>>> d05458da169f57d22ac30735f179c3dbc86cc27c
