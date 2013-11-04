@@ -5,8 +5,8 @@
 #include <sys/socket.h>
 
 main{
-	char *CLIENT;
-	struct sockaddr_in clientaddr;
+    char *CLIENT;
+    struct sockaddr_in clientaddr;
     socklen_t addrlen;
     char PORT[4];
     CLIENT = getenv("PWD");
@@ -18,6 +18,5 @@ main{
     startServer(PORT);
    
     return 0;
-}
 	
 }
