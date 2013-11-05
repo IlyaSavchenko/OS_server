@@ -15,7 +15,7 @@ main{
 
     for (int i = 0; i < 1000; i++)
         clients[i] = -1;
-    startServer(PORT);
+    Server(PORT);
 
     int conn = 0;
 	while (1)
@@ -30,4 +30,13 @@ main{
     }
     return 0;
 	
+}
+
+void Server(char *port)
+{
+    struct addrinfo hints, *res, *p;
+    memset (&hints, 0, sizeof(hints));
+    hints.ai_family = AF_UNSPEC;    //AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = AI_PASSIVE;
 }
