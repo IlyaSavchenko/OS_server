@@ -6,10 +6,11 @@
 
 main{
 	char *CLIENT;
+	int listenfd, clients[1000];
 	struct sockaddr_in clientaddr;
     socklen_t addrlen;
     char PORT[4];
-    CLIENT = getenv("PWD");
+    CLIENT = getenv("PWD");  
     strcpy(PORT,"9080");
 
     for (int i = 0; i < 1000; i++)
@@ -23,7 +24,7 @@ main{
         clients[conn] = accept (listenfd, (struct sockaddr *) &clientaddr, &addrlen);
 
         if (clients[conn] < 0)
-            error ("ERROR!!!");
+            error ("ERROR in accept!!!");
 
         while (clients[conn] != -1) conn  = (conn  + 1) % 1000;
     }
