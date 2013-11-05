@@ -12,12 +12,21 @@ main{
     CLIENT = getenv("PWD");
     strcpy(PORT,"9080");
 
-    int i;
-    for (i = 0; i < 1000; i++)
+    for (int i = 0; i < 1000; i++)
         clients[i] = -1;
     startServer(PORT);
-   
+
+    int conn = 0;
+	while (1)
+    {
+        addrlen = sizeof(clientaddr);
+        clients[conn] = accept (listenfd, (struct sockaddr *) &clientaddr, &addrlen);
+
+        if (clients[conn] < 0)
+            error ("ERROR!!!");
+
+        while (clients[conn] != -1) conn  = (conn  + 1) % 1000;
+    }
     return 0;
-}
 	
 }
