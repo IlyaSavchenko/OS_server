@@ -41,4 +41,13 @@ void Server(char *port)
     hints.ai_family = AF_UNSPEC;    //AF_INET;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
+    if (getaddrinfo(NULL, port, &hints, &res) != 0)
+    {
+        perror ("ERROR in getaddrinfo!!!");
+        exit(1);
+    }
+    for (p = res; p != NULL; p = p -> ai_next)
+    {
+        listenfd = socket (p->ai_family, p->ai_socktype, 0);
+    }
 }
