@@ -8,6 +8,8 @@ main{
 	char *CLIENT;
 	int listenfd, clients[1000];
 	struct sockaddr_in clientaddr;
+    char *CLIENT;
+    struct sockaddr_in clientaddr;
     socklen_t addrlen;
     char PORT[4];
     CLIENT = getenv("PWD");  
