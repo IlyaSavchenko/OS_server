@@ -57,13 +57,11 @@ void Server(char *port)
     	exit(1);
     }
 
-    if ( listen (listenfd, 1000) == 0 )
-    {
-    	exit(0);
-    }
-    else{
+    
+    freeaddrinfo(res);  //освобождает память, предназначенную для динамически выделяемого связанного списка res.
+
+    if ( listen (listenfd, 1000) == 0 ){
         perror("ERROR in listen!!!");
         exit(1);
     }
-    freeaddrinfo(res);  //освобождает память, предназначенную для динамически выделяемого связанного списка res.
 }
