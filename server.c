@@ -3,7 +3,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/socket.h>
-
+int listenfd;
 main{
 	char *CLIENT;
 	int listenfd, clients[1000];
@@ -49,11 +49,21 @@ void Server(char *port)
     for (p = res; p != NULL; p = p -> ai_next)
     {
         listenfd = socket (p->ai_family, p->ai_socktype, 0);
+        if (bind(listenfd, p -> ai_addr, p -> ai_addrlen) == 0) 
+        	break;
     }
     if (p == NULL) {
-    	perror ("ERROR in socket");
+    	perror ("ERROR in socket!!!");
     	exit(1);
     }
 
+    if ( listen (listenfd, 1000) == 0 )
+    {
+    	exit(0);
+    }
+    else{
+        perror("ERROR in listen!!!");
+        exit(1);
+    }
     freeaddrinfo(res);  //освобождает память, предназначенную для динамически выделяемого связанного списка res.
 }
