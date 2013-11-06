@@ -50,12 +50,10 @@ void Server(char *port)
     {
         listenfd = socket (p->ai_family, p->ai_socktype, 0);
     }
-    if (p != NULL)
-    {
-        exit(0);
-    }
-    else{
+    if (p == NULL) {
     	perror ("ERROR in socket");
     	exit(1);
     }
+
+    freeaddrinfo(res);  //освобождает память, предназначенную для динамически выделяемого связанного списка res.
 }
