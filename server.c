@@ -50,4 +50,12 @@ void Server(char *port)
     {
         listenfd = socket (p->ai_family, p->ai_socktype, 0);
     }
+    if (p != NULL)
+    {
+        exit(0);
+    }
+    else{
+    	perror ("ERROR in socket");
+    	exit(1);
+    }
 }
