@@ -74,6 +74,31 @@ void Client(int n){
 
     if (rcvd != 0)   
         fprintf(stderr,("ERROR in recv!!!\n"));
+    else {
+    	printf("%s", mesg);
+        reqline[0] = strtok (mesg, " \t\n");
+        if (strncmp(reqline[0], "GET\0", 4) == 0 )
+        {
+            reqline[1] = strtok (NULL, " \t");
+            reqline[2] = strtok (NULL, " \t\n");
+            if ( strncmp( reqline[2], "HTTP/1.0", 8) != 0 && strncmp( reqline[2], "HTTP/1.1", 8) != 0 )
+            {
+                send(clients[n], "HTTP/1.1 400 Bad Request\n", 25,0);
+            }
+            else
+            {
+                strcpy(path, CLIENT);
+                strcpy(&path[strlen(CLIENT)], reqline[1]);
+                if ( (fd = open(path, O_RDONLY)) != -1 )    
+                {
+                    send(clients[n], "HTTP/1.1 200 OK\r\n", 17, 0);
+                    while ( (bytes_read = read(fd, data_to_send, 1024)) > 0 )
+                        write (clients[n], data_to_send, bytes_read);
+                }
+                else    
+                    send(clients[n], "HTTP/1.1 404 Not Found\n", 23,0); 
+            }
+    }
 
     shutdown (clients[n], SHUT_RDWR);
     close(clients[n]);
