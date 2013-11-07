@@ -65,8 +65,8 @@ void Server(char *port)
     }
 }
 
-void Client(){
-	char mesg[], *reqline[3], data_to_send[BYTES], path[];
+void Client(int n){
+	char mesg[], *reqline[3], data_to_send[1024], path[];
     int rcvd, fd, bytes_read;
 
     memset( (void*)mesg, (int)'\0', 1000 );
@@ -74,4 +74,9 @@ void Client(){
 
     if (rcvd != 0)   
         fprintf(stderr,("ERROR in recv!!!\n"));
+
+    shutdown (clients[n], SHUT_RDWR);
+    close(clients[n]);
+    clients[n] = -1;
+
 }
