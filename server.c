@@ -3,13 +3,12 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/socket.h>
-int listenfd;
+
+char *CLIENT;
+int listenfd, clients[1000];
+
 main{
-	char *CLIENT;
-	int listenfd, clients[1000];
 	struct sockaddr_in clientaddr;
-    char *CLIENT;
-    struct sockaddr_in clientaddr;
     socklen_t addrlen;
     char PORT[4];
     CLIENT = getenv("PWD");  
@@ -64,4 +63,15 @@ void Server(char *port)
         perror("ERROR in listen!!!");
         exit(1);
     }
+}
+
+void Client(){
+	char mesg[], *reqline[3], data_to_send[BYTES], path[];
+    int rcvd, fd, bytes_read;
+
+    memset( (void*)mesg, (int)'\0', 1000 );
+    rcvd = recv(clients[n], mesg, 1000, 0);
+
+    if (rcvd != 0)   
+        fprintf(stderr,("ERROR in recv!!!\n"));
 }
