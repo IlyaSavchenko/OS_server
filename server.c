@@ -3,18 +3,32 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/socket.h>
+#include <netdb.h>
+#include <arpa/inet.h>
+#include <signal.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+
+
+#define BACKLOG 1000
 
 char *CLIENT;
-int listenfd, clients[1000];
+int listenfd, clients[BACKLOG];
+void Server(char *);
+void Client(int);
 
-main{
+int main(int argc, char* argv[]){
 	struct sockaddr_in clientaddr;
     socklen_t addrlen;
     char PORT[4];
     CLIENT = getenv("PWD");  
-    strcpy(PORT,"9080");
 
-    for (int i = 0; i < 1000; i++)
+    strcpy(PORT,"9080");
+    printf("localhost: %s%s%s\n","\033[92m",PORT,"\033[0m");
+    
+    int i;
+    for (i = 0; i < BACKLOG; i++)
         clients[i] = -1;
     Server(PORT);
 
@@ -26,8 +40,17 @@ main{
 
         if (clients[conn] < 0)
             error ("ERROR in accept!!!");
+        else
+        {
+            if (fork() == 0)
+            {
+                Client(conn);
+                exit(0);
+            }
+        }
 
-        while (clients[conn] != -1) conn  = (conn  + 1) % 1000;
+        while (clients[conn] != -1) 
+        	conn  = (conn  + 1) % BACKLOG;
     }
     return 0;
 	
@@ -39,7 +62,7 @@ void Server(char *port)
     memset (&hints, 0, sizeof(hints));
     hints.ai_family = AF_UNSPEC;    //AF_INET;
     hints.ai_socktype = SOCK_STREAM;
-    hints.ai_flags = AI_PASSIVE;
+    hints.ai_flags = AI_PASSIVE;  //Указание своего хоста
     if (getaddrinfo(NULL, port, &hints, &res) != 0)
     {
         perror ("ERROR in getaddrinfo!!!");
@@ -59,20 +82,20 @@ void Server(char *port)
     
     freeaddrinfo(res);  //освобождает память, предназначенную для динамически выделяемого связанного списка res.
 
-    if ( listen (listenfd, 1000) == 0 ){
+    if ( listen (listenfd, BACKLOG) != 0 ){
         perror("ERROR in listen!!!");
         exit(1);
     }
 }
 
 void Client(int n){
-	char mesg[], *reqline[3], data_to_send[1024], path[];
+	char mesg[1000], *reqline[3], data_to_send[1024], path[1000];
     int rcvd, fd, bytes_read;
 
     memset( (void*)mesg, (int)'\0', 1000 );
     rcvd = recv(clients[n], mesg, 1000, 0);
 
-    if (rcvd != 0)   
+    if (rcvd < 0)   
         fprintf(stderr,("ERROR in recv!!!\n"));
     else {
     	printf("%s", mesg);
@@ -98,6 +121,7 @@ void Client(int n){
                 else    
                     send(clients[n], "HTTP/1.1 404 Not Found\n", 23,0); 
             }
+        }
     }
 
     shutdown (clients[n], SHUT_RDWR);
