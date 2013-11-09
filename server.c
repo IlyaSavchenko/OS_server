@@ -23,7 +23,6 @@ int main(int argc, char* argv[]){
     socklen_t addrlen;
     char PORT[4];
     CLIENT = getenv("PWD");  
-
     strcpy(PORT,"9080");
     printf("localhost: %s%s%s\n","\033[92m",PORT,"\033[0m");
     
@@ -71,6 +70,8 @@ void Server(char *port)
     for (p = res; p != NULL; p = p -> ai_next)
     {
         listenfd = socket (p->ai_family, p->ai_socktype, 0);
+        if (listenfd == -1) 
+        	continue;
         if (bind(listenfd, p -> ai_addr, p -> ai_addrlen) == 0) 
         	break;
     }
@@ -79,10 +80,9 @@ void Server(char *port)
     	exit(1);
     }
 
-    
     freeaddrinfo(res);  //освобождает память, предназначенную для динамически выделяемого связанного списка res.
 
-    if ( listen (listenfd, BACKLOG) != 0 ){
+    if (listen (listenfd, BACKLOG) != 0 ){
         perror("ERROR in listen!!!");
         exit(1);
     }
@@ -104,7 +104,7 @@ void Client(int n){
         {
             reqline[1] = strtok (NULL, " \t");
             reqline[2] = strtok (NULL, " \t\n");
-            if ( strncmp( reqline[2], "HTTP/1.0", 8) != 0 && strncmp( reqline[2], "HTTP/1.1", 8) != 0 )
+            if (strncmp( reqline[2], "HTTP/1.0", 8) != 0 && strncmp( reqline[2], "HTTP/1.1", 8) != 0 )
             {
                 send(clients[n], "HTTP/1.1 400 Bad Request\n", 25,0);
             }
@@ -112,10 +112,11 @@ void Client(int n){
             {
                 strcpy(path, CLIENT);
                 strcpy(&path[strlen(CLIENT)], reqline[1]);
-                if ( (fd = open(path, O_RDONLY)) != -1 )    
+                
+                if ((fd = open(path, O_RDONLY)) != -1 )    
                 {
-                    send(clients[n], "HTTP/1.1 200 OK\r\n", 17, 0);
-                    while ( (bytes_read = read(fd, data_to_send, 1024)) > 0 )
+                    send(clients[n], "HTTP/1.1 200 OK\n\n", 17, 0);
+                    while ((bytes_read = read(fd, data_to_send, 1024)) > 0 )
                         write (clients[n], data_to_send, bytes_read);
                 }
                 else    
