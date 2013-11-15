@@ -80,13 +80,29 @@ void Server(char *port)
     	exit(1);
     }
 
-    freeaddrinfo(res);  //освобождает память, предназначенную для динамически выделяемого связанного списка res.
+    freeaddrinfo(res); 
 
     if (listen (listenfd, BACKLOG) != 0 ){
         perror("ERROR in listen!!!");
         exit(1);
     }
 }
+
+
+int send_all(int socket, const void *buffer, size_t length, int flags)
+{
+    ssize_t n;
+    const char *p = buffer;
+    while (length > 0)
+    {
+        n = send(socket, p, length, flags);
+        if (n <= 0) break;
+        p += n;
+        length -= n;
+    }
+    return (n <= 0) ? -1 : 0;
+}
+
 
 void Client(int n){
 	char mesg[1000], *reqline[3], data_to_send[1024], path[1000];
@@ -106,7 +122,7 @@ void Client(int n){
             reqline[2] = strtok (NULL, " \t\n");
             if (strncmp( reqline[2], "HTTP/1.0", 8) != 0 && strncmp( reqline[2], "HTTP/1.1", 8) != 0 )
             {
-                send(clients[n], "HTTP/1.1 400 Bad Request\n", 25,0);
+                send_all(clients[n], "HTTP/1.1 400 Bad Request\n", 25, 0);
             }
             else
             {
@@ -115,12 +131,12 @@ void Client(int n){
                 
                 if ((fd = open(path, O_RDONLY)) != -1 )    
                 {
-                    send(clients[n], "HTTP/1.1 200 OK\n\n", 17, 0);
+                    send_all(clients[n], "HTTP/1.1 200 OK\n\n", 17, 0);
                     while ((bytes_read = read(fd, data_to_send, 1024)) > 0 )
                         write (clients[n], data_to_send, bytes_read);
                 }
                 else    
-                    send(clients[n], "HTTP/1.1 404 Not Found\n", 23,0); 
+                    send_all(clients[n], "HTTP/1.1 404 Not Found\n", 23,0); 
             }
         }
     }
