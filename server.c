@@ -98,6 +98,8 @@ void Client(int n){
 
     if (rcvd < 0)   
         fprintf(stderr,("ERROR in recv!!!\n"));
+    else if (rcvd == 0)    // receive socket closed
+        fprintf(stderr,"Client disconnected.\n");
     else {
     	printf("%s", mesg);
         reqline[0] = strtok (mesg, " \t\n");
