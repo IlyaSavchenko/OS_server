@@ -127,16 +127,13 @@ void Client(int n){
         {
             reqline[1] = strtok(NULL," ");
 
-            if (strstr(reqline[1], "..") != NULL)
-            reqline[1] = "/index.html";
-
             if (strncmp(reqline[1],"/", 2) == 0)
-            reqline[1] = "/index.html";
+            	reqline[1] = "/index.html";
 
             if ((fd = open(reqline[1] + 1, O_RDONLY)) != -1)
             {
-            reply.header = "HTTP/1.1 200 OK\n\n";
-            send(clients[n], reply.header, strlen(reply.header), 0);
+            	reply.header = "HTTP/1.1 200 OK\n\n";
+            	send(clients[n], reply.header, strlen(reply.header), 0);
 
             while((bytes_read = read(fd, data_to_send, BUFF)) > 0)
             {
