@@ -1,4 +1,4 @@
-#include <stdio.h>
+# include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -18,6 +18,12 @@ char *CLIENT;
 int listenfd, clients[BACKLOG];
 void Server(char *);
 void Client(int);
+
+struct http
+{
+  char *header;
+  char *body;
+} reply;
 
 int main(int argc, char* argv[]){
 	struct sockaddr_in clientaddr;
@@ -89,29 +95,29 @@ void Server(char *port)
     }
 }
 
-int send_all(int socket, const void *buffer, size_t length, int flags)
-{
-    ssize_t n;
-    const char *p = buffer;
-    while (length > 0)
-    {
-        n = send(socket, p, length, flags);
-        if (n <= 0) break;
-        p += n;
-        length -= n;
-    }
-    return (n <= 0) ? -1 : 0;
-}
+// int send_all(int socket, const void *buffer, size_t length, int flags)
+// {
+//     ssize_t n;
+//     const char *p = buffer;
+//     while (length > 0)
+//     {
+//         n = send(socket, p, length, flags);
+//         if (n <= 0) break;
+//         p += n;
+//         length -= n;
+//     }
+//     return (n <= 0) ? -1 : 0;
+// }
 
 void Client(int n){
-	char mesg[1000], *reqline[3], data_to_send[BUFF], path[1000];
+	char mesg[99999], *reqline[3], data_to_send[BUFF], path[99999];
     int rcvd, fd, bytes_read;
 
-    memset( (void*)mesg, (int)'\0', 1000 );
-    rcvd = recv(clients[n], mesg, 1000, 0);
+    memset( (void*)mesg, (int)'\0', 99999 );
+    rcvd = read(clients[n], mesg, sizeof(mesg));
 
     if (rcvd < 0)   
-        fprintf(stderr,("ERROR in recv!!!\n"));
+        fprintf(stderr,("ERROR in read!!!\n"));
     else if (rcvd == 0)    // receive socket closed
         fprintf(stderr,"Client disconnected.\n");
     else {
@@ -119,31 +125,37 @@ void Client(int n){
         reqline[0] = strtok (mesg, " \t\n");
         if (strncmp(reqline[0], "GET\0", 4) == 0 )
         {
-            reqline[1] = strtok (NULL, " \t");
-            reqline[2] = strtok (NULL, " \t\n");
-            if (strncmp( reqline[2], "HTTP/1.0", 8) != 0 && strncmp( reqline[2], "HTTP/1.1", 8) != 0 )
+            reqline[1] = strtok(NULL," ");
+
+            if (strstr(reqline[1], "..") != NULL)
+            reqline[1] = "/index.html";
+
+            if (strncmp(reqline[1],"/", 2) == 0)
+            reqline[1] = "/index.html";
+
+            if ((fd = open(reqline[1] + 1, O_RDONLY)) != -1)
             {
-                send_all(clients[n], "HTTP/1.1 400 Bad Request\n", 25,0);
-            }
-            else
+            reply.header = "HTTP/1.1 200 OK\n\n";
+            send(clients[n], reply.header, strlen(reply.header), 0);
+
+            while((bytes_read = read(fd, data_to_send, BUFF)) > 0)
             {
-                strcpy(path, CLIENT);
-                strcpy(&path[strlen(CLIENT)], reqline[1]);
-                
-                if ((fd = open(path, O_RDONLY)) != -1 )    
-                {
-                    send_all(clients[n], "HTTP/1.1 200 OK\n\n", 17, 0);
-                    while ((bytes_read = read(fd, data_to_send, BUFF)) > 0 )
-                        write (clients[n], data_to_send, bytes_read);
-                }
-                else    
-                    send_all(clients[n], "HTTP/1.1 404 Not Found\n", 23,0); 
+                write(clients[n], data_to_send, bytes_read);
             }
+            close(fd);
+        }
+        else
+        {
+            reply.header = "HTTP/1.1 404 Not Found\n\n";
+            reply.body = "<html><body><h1>404 Not Found</h1></body></html>";
+            send(clients[n], reply.header, strlen(reply.header), 0);
+            send(clients[n], reply.body, strlen(reply.body), 0);
         }
     }
+}
 
-    shutdown (clients[n], SHUT_RDWR);
-    close(clients[n]);
-    clients[n] = -1;
+shutdown (clients[n], SHUT_RDWR);
+close(clients[n]);
+clients[n] = -1;
 
 }
